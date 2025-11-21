@@ -1,0 +1,21 @@
+package com.springboot.dto;
+
+import com.springboot.domain.Member;
+
+import java.time.LocalDateTime;
+
+public record MemberResponse(
+        Long id,
+        String username,
+        String name,
+        String email,
+        LocalDateTime createdAt) {
+    public static MemberResponse from(Member member){
+        return  new MemberResponse(member.getId(),
+                member.getUsername(),
+                member.getName(),
+                                    member.getEmail(),
+                member.getCreatedAt()
+        );
+    }
+}
