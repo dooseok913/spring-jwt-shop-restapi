@@ -45,5 +45,20 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    public void validateCancelable() {
+        if (this.status == OrderStatus.CANCELED) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
+        if (this.status == OrderStatus.SHIPPED) {
+            throw  new IllegalStateException("배송이 시작된 주문은 취소할 수 없습니다.");
+        }
+        if (this.status == OrderStatus.DELIVERED) {
+            throw  new IllegalStateException("배송 완료된 주문은 취소할 수 없습니다.");
+        }
+    }
+    public void cancel() {
+        this.status = OrderStatus.CANCELED;
+        this.orderAt = LocalDateTime.now();
+    }
 
 }

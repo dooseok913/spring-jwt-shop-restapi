@@ -37,4 +37,19 @@ public class Product {
         this.stock = stock;
         this.createdAt = LocalDateTime.now();
     }
+    public  void reduceStock(int quantity){
+        if(this.stock < quantity) {
+            throw new IllegalStateException("재고가 부족합니다.");
+        }
+        this.stock -= quantity;
+    }
+
+    public  void addStock(int quantity) {
+        this.stock += quantity;
+    }
+
+
+
+
+
 }
