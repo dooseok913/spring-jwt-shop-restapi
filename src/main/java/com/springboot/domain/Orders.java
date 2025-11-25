@@ -1,5 +1,7 @@
 package com.springboot.domain;
 
+import com.springboot.exception.CustomException;
+import com.springboot.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,13 +49,13 @@ public class Orders {
 
     public void validateCancelable() {
         if (this.status == OrderStatus.CANCELED) {
-            throw new IllegalStateException("이미 취소된 주문입니다.");
+            throw new CustomException(ErrorCode.ORDER_CANNOT_CANCEL);
         }
         if (this.status == OrderStatus.SHIPPED) {
-            throw  new IllegalStateException("배송이 시작된 주문은 취소할 수 없습니다.");
+            throw  new CustomException(ErrorCode.ORDER_CANNOT_CANCEL);
         }
         if (this.status == OrderStatus.DELIVERED) {
-            throw  new IllegalStateException("배송 완료된 주문은 취소할 수 없습니다.");
+            throw  new CustomException(ErrorCode.ORDER_CANNOT_CANCEL);
         }
     }
     public void cancel() {

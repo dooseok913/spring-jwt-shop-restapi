@@ -4,6 +4,8 @@ import com.springboot.domain.Member;
 import com.springboot.dto.MemberLoginRequest;
 import com.springboot.dto.MemberRequest;
 import com.springboot.dto.MemberResponse;
+import com.springboot.exception.CustomException;
+import com.springboot.exception.ErrorCode;
 import com.springboot.repository.MemberRepository;
 import com.springboot.util.JwtUtil;
 import lombok.NoArgsConstructor;
@@ -25,7 +27,7 @@ public class MemberService {
     @Transactional
     public void create(MemberRequest request){
         if(memberRepository.existsByUsername(request.username())) {
-            throw new RuntimeException("이미 존재하는 회원 입니다.");
+            throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
         }
         String encodePw = passwordEncoder.encode(request.password());
 
@@ -42,11 +44,11 @@ public class MemberService {
     public String login (MemberLoginRequest request){
 
         Member member = memberRepository.findByUsername(request.username())
-                .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
 
         if( !passwordEncoder.matches(request.password(),member.getPassword()) ) {
-            throw  new RuntimeException("비밀번호가 일치하지 않습니다. ");
+            throw  new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         return jwtUtil.createToken(member.getUsername());

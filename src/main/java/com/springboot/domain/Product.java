@@ -1,6 +1,8 @@
 package com.springboot.domain;
 
 
+import com.springboot.exception.CustomException;
+import com.springboot.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,7 +41,7 @@ public class Product {
     }
     public  void reduceStock(int quantity){
         if(this.stock < quantity) {
-            throw new IllegalStateException("재고가 부족합니다.");
+            throw new CustomException(ErrorCode.OUT_OF_STOCK);
         }
         this.stock -= quantity;
     }

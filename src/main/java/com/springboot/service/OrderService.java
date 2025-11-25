@@ -9,6 +9,8 @@ import com.springboot.dto.OrderCancelRequest;
 import com.springboot.dto.OrderCancelResponse;
 import com.springboot.dto.OrderRequest;
 import com.springboot.dto.OrderResponse;
+import com.springboot.exception.CustomException;
+import com.springboot.exception.ErrorCode;
 import com.springboot.repository.MemberRepository;
 import com.springboot.repository.OrderCancelHistoryRepository;
 import com.springboot.repository.OrderRepository;
@@ -35,10 +37,10 @@ public class OrderService {
     @Transactional
     public OrderResponse create(String username, OrderRequest request){
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(()-> new RuntimeException("회원이 존재하지 않습니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Product product = productRepository.findById(request.productId())
-                .orElseThrow(()-> new RuntimeException("상품이 존재하지 않습니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
 
 
@@ -54,7 +56,7 @@ public class OrderService {
 
     public List<OrderResponse> getOrdersByMember(String username){
             Member member = memberRepository.findByUsername(username)
-                    .orElseThrow(()-> new RuntimeException("회원이 존재하지 않습니다."));
+                    .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
             List<Orders> orders = orderRepository.findByMemberId(member.getId());
 
 
@@ -64,15 +66,15 @@ public class OrderService {
     @Transactional
     public OrderCancelResponse cancel(Long orderId, String username, OrderCancelRequest request) {
         Orders order =  orderRepository.findById(orderId)
-                .orElseThrow(()->new RuntimeException("주문을 찾을 수 없습니다."));
+                .orElseThrow(()->new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
         if(!order.getMember().getUsername().equals(username)){
-            throw new IllegalArgumentException("본인만이 주문 취소할 수 있습니다.");
+            throw new CustomException(ErrorCode.ORDER_UNAUTHORIZED);
         }
 
 
         if(order.getOrderAt().isBefore(LocalDateTime.now().minusMinutes(30))){
-            throw new IllegalArgumentException("주문 후 30분이 지나 취소할 수 없습니다.");
+            throw new CustomException(ErrorCode.ORDER_CANNOT_CANCEL);
         }
         order.validateCancelable();
         order.cancel();
