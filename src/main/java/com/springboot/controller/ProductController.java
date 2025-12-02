@@ -1,9 +1,6 @@
 package com.springboot.controller;
 
-import com.springboot.dto.MemberRequest;
-import com.springboot.dto.MemberResponse;
-import com.springboot.dto.ProductRequest;
-import com.springboot.dto.ProductResponse;
+import com.springboot.dto.*;
 import com.springboot.service.MemberService;
 import com.springboot.service.ProductService;
 import lombok.Getter;
@@ -31,6 +28,14 @@ public class ProductController {
     public Page<ProductResponse> getAll(Pageable pageable) {
 
         return productService.getAll(pageable);
+    }
+
+    @GetMapping("/search")
+    public Page<ProductResponse> search (
+            ProductSearchCond cond,
+            Pageable pageable
+    ){
+        return productService.search(cond, pageable);
     }
 
 }
