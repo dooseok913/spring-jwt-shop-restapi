@@ -33,7 +33,7 @@ public class Orders {
 
     private LocalDateTime orderAt;
 
-
+    private LocalDateTime canceledAt;
 
     public Orders(Member member, Product product, int quantity) {
         this.member = member;
@@ -60,7 +60,7 @@ public class Orders {
     }
     public void cancel() {
         this.status = OrderStatus.CANCELED;
-        this.orderAt = LocalDateTime.now();
+        this.canceledAt = LocalDateTime.now();
     }
 
 }

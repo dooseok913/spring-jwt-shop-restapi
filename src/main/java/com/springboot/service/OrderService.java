@@ -1,14 +1,8 @@
 package com.springboot.service;
 
 
-import com.springboot.domain.Member;
-import com.springboot.domain.OrderStatus;
-import com.springboot.domain.Orders;
-import com.springboot.domain.Product;
-import com.springboot.dto.OrderCancelRequest;
-import com.springboot.dto.OrderCancelResponse;
-import com.springboot.dto.OrderRequest;
-import com.springboot.dto.OrderResponse;
+import com.springboot.domain.*;
+import com.springboot.dto.*;
 import com.springboot.exception.CustomException;
 import com.springboot.exception.ErrorCode;
 import com.springboot.repository.MemberRepository;
@@ -82,11 +76,23 @@ public class OrderService {
 
         order.getProduct().addStock(order.getQuantity());
 
+        OrderCancelHistory history = new OrderCancelHistory(order, username, request.reason());
+        cancelHistoryRepository.save(history);
 
 
 
         return OrderCancelResponse.from(order);
 
     }
+
+    //OrderCancelHistory 조회 API 만들기
+
+    public List<OrderCancelHistoryResponse> getMyCancelHistory(String username){
+        List<OrderCancelHistory> historyList =
+                cancelHistoryRepository.findByCanceledBy(username);
+
+        return historyList.stream().map(OrderCancelHistoryResponse::from).toList();
+    }
+
 
 }

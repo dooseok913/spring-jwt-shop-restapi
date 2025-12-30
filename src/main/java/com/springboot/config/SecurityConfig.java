@@ -25,6 +25,11 @@ public class SecurityConfig {
 
                 // 2. HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers("/members", "/members/login").permitAll()
                         .anyRequest().authenticated()
                 )

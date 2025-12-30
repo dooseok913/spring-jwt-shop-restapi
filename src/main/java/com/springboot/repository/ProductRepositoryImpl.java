@@ -1,8 +1,8 @@
 package com.springboot.repository;
 
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.springboot.domain.Product;
 import com.springboot.domain.QProduct;
 import com.springboot.dto.ProductSearchCond;
@@ -16,17 +16,23 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductRepositoryImpl implements ProductRepositoryCustom  {
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
     private final JPAQueryFactory query;
 
     @Override
-    public Page<Product> search(ProductSearchCond cond, Pageable pageable){
+    public Page<Product> search(ProductSearchCond cond, Pageable pageable) {
+
         QProduct product = QProduct.product;
+
+        // ✅ 핵심: PathBuilder는 엔티티 + alias 문자열
+        PathBuilder<Product> entityPath =
+                new PathBuilder<>(Product.class, "product");
 
         BooleanBuilder builder = new BooleanBuilder();
 
         // 이름 검색
-        if(cond.name() != null && !cond.name().isBlank()) {
+        if (cond.name() != null && !cond.name().isBlank()) {
             builder.and(product.name.containsIgnoreCase(cond.name()));
         }
 
@@ -45,10 +51,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom  {
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(QueryDslSortUtil.toOrderSpecifiers(pageable.getSort(), product))
+                // ✅ 여기서만 orderBy
+                .orderBy(
+                        QueryDslSortUtil.toOrderSpecifiers(
+                                pageable.getSort(),
+                                entityPath
+                        )
+                )
                 .fetch();
 
-        // 전체 개수
         long total = query
                 .select(product.count())
                 .from(product)
@@ -56,7 +67,5 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom  {
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
-
     }
-
 }

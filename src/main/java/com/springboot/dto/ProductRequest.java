@@ -1,6 +1,9 @@
 package com.springboot.dto;
 
-public record ProductRequest(String name,
-                             int price,
-                             int stock) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record ProductRequest(
+        @Schema(example = "아이폰 15") String name,
+        @Schema(example = "1200000") int price,
+        @Schema(example = "50") int stock) {
 }
